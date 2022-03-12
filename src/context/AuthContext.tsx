@@ -1,3 +1,4 @@
+import { api } from '@/services/api';
 import { createContext, ReactNode } from 'react';
 
 type SignInCredentials = {
@@ -16,12 +17,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAuthenticated = false;
 
   async function signIn({ email, password }: SignInCredentials) {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log(email, password);
-        resolve();
-      }, 1000);
-    });
+    try {
+      await api.post(`/sessions`, { email, password });
+    } catch (err) {
+      console.error(`@SignIn Error`, err);
+    }
   }
 
   return (
