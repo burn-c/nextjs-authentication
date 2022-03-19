@@ -1,6 +1,5 @@
 import axios, { AxiosError } from 'axios';
 import { parseCookies, setCookie } from 'nookies';
-
 import { signOut } from '@/context/AuthContext';
 
 let isRefreshing = false;
@@ -24,18 +23,18 @@ export function setupAPIClient(ctx = undefined) {
     (error: AxiosError) => {
       if (error?.response?.status === 401) {
         // Refresh token
-        console.log(`Refreshing token - 401`);
+        console.info(`Error- 401`);
         if (error.response?.data?.code === `token.expired`) {
+          console.info(`Refreshing try`);
           cookies = parseCookies(ctx);
 
           const { 'nextauth.refreshToken': refreshToken } = cookies;
           const originalConfig = error.config;
 
           if (!isRefreshing) {
+            console.info(`Refreshing isRefreshing`);
+
             isRefreshing = true;
-            console.log(
-              `Refreshing token -------------------------------------`,
-            );
 
             api
               .post(`/refresh`, { refreshToken })
@@ -63,12 +62,14 @@ export function setupAPIClient(ctx = undefined) {
                   request.onSuccess(token),
                 );
                 failedRequestsQueue = [];
+                console.info(`Refreshing success`);
               })
               .catch((error) => {
                 failedRequestsQueue.forEach((request) =>
                   request.onFailure(error),
                 );
                 failedRequestsQueue = [];
+                console.info(`Refreshing error`);
 
                 signOut();
               })
@@ -89,6 +90,8 @@ export function setupAPIClient(ctx = undefined) {
             });
           });
         } else {
+          console.info(`Unknown error - 401`);
+
           signOut();
         }
       }
