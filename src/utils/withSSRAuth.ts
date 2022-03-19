@@ -1,3 +1,5 @@
+import { destroyAuthCookie } from '@/context/AuthContext';
+import { AuthTokenError } from '@/services/errors/AuthTokenError';
 import {
   GetServerSideProps,
   GetServerSidePropsContext,
@@ -20,6 +22,19 @@ export function withSSRAuth<P>(fn: GetServerSideProps<P>) {
       };
     }
 
-    return await fn(ctx);
+    try {
+      return await fn(ctx);
+    } catch (error) {
+      if (error instanceof AuthTokenError) {
+        destroyAuthCookie(ctx);
+
+        return {
+          redirect: {
+            destination: `/`,
+            permanent: false,
+          },
+        };
+      }
+    }
   };
 }

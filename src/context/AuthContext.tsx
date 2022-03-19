@@ -2,6 +2,7 @@ import Router from 'next/router';
 import { createContext, ReactNode, useEffect, useState } from 'react';
 import { setCookie, parseCookies, destroyCookie } from 'nookies';
 import { api } from '@/services/apiClient';
+import { AuthTokenError } from '@/services/errors/AuthTokenError';
 
 type User = {
   email: string;
@@ -22,12 +23,18 @@ type AuthContextData = {
 
 export const AuthContext = createContext({} as AuthContextData);
 
+export function destroyAuthCookie(ctx = undefined) {
+  destroyCookie(ctx, `nextauth.token`);
+  destroyCookie(ctx, `nextauth.refreshToken`);
+}
+
 export function signOut() {
   if (typeof window !== `undefined`) {
-    destroyCookie(undefined, `nextauth.token`);
-    destroyCookie(undefined, `nextauth.refreshToken`);
+    destroyAuthCookie();
 
-    Router.push(`/`);
+    return Router.push(`/`);
+  } else {
+    return Promise.reject(new AuthTokenError());
   }
 }
 
