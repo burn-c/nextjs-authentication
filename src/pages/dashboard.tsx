@@ -1,5 +1,8 @@
-import { api } from '@/services/api';
 import { useEffect } from 'react';
+
+import { api } from '@/services/apiClient';
+import { withSSRAuth } from '@/utils';
+import { setupAPIClient } from '@/services/api';
 
 export default function Dashboard() {
   useEffect(() => {
@@ -9,3 +12,13 @@ export default function Dashboard() {
   }, []);
   return <h1>Dashboard</h1>;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  const apiClient = setupAPIClient(ctx);
+  const response = await apiClient.get(`/me`);
+  console.log(response?.data);
+  return {
+    props: {},
+  };
+});
