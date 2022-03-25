@@ -3,7 +3,7 @@ import { useContext, useEffect } from 'react';
 import { api } from '@/services/apiClient';
 import { withSSRAuth } from '@/utils';
 import { setupAPIClient } from '@/services/api';
-import { AuthContext } from '@/context/AuthContext';
+import { AuthContext, signOut } from '@/context/AuthContext';
 import { useCan } from '@/hooks';
 import { Can } from '@/componentes';
 
@@ -26,6 +26,8 @@ export default function Dashboard() {
         <h1>User has permission</h1>
       </Can>
       {useCanSeeMetrics && <h1>Metrics</h1>}
+
+      <button onClick={signOut}>Sign Out</button>
     </>
   );
 }
